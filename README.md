@@ -1,4 +1,4 @@
-# Vendor_PM_support
+# Vendor PM support
 Auto internal ticketing and define preconfiguration for Vendor maintenance for Tier1 engineer
 
 [Purpose]
