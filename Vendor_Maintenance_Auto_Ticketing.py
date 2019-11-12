@@ -21,9 +21,9 @@ IHMS_POP_List_API = 'XXXXXX.jsp'    # DB API
 SubnetMaskRe = re.compile(r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}')
 NETWMRe = re.compile('NETWM-[0-9]{1,6}')
 ChromeDRV = 'XXXXXX'                # ChomeDriver location
-ISSUE = 'https://issues.cdnetworks.com'
-MasterPM = 'https://issues.cdnetworks.com/browse/GNOC-1802'
-WikiPM = 'https://wiki.cdnetworks.com/confluence/display/infratech/2019+Vendor+Maintenance+Schedule'
+ISSUE = 'XXXXX.com'                                 # internal ticketing system
+MasterPM = 'XXXXX.com/XXXXX'                        # internal ticketing system
+WikiPM = 'XXXXX.com/XXXXX'                          # internal document repository
 DenyPolicyName = ''
 CMD_DIC = {}
 ##############################################################################################
@@ -36,10 +36,6 @@ def Query_NIDB(CDNWC):
         if CDNWC in i:
             NGPC = i.split('|')[1]
             Region = i.split('|')[-4]
-    '''
-    NGPC = 'inx1-ams'
-    Region = 'EU'
-    '''
     data = requests.get(NIDB_SW_List_API).text
     SW_List = data.splitlines()
     for i in SW_List:
@@ -127,7 +123,7 @@ def Query_Circuit_Info_JunOS(Host):
     SS.sendline(KSSJPOTP)
     SS.expect('\$')
     DisplayText(SS.before, SS.after)
-    SS.sendline('kss 61.110.254.54')
+    SS.sendline('XXXXXX')                       # ssh 'Jump Server IP'
     try:
         SS.expect('assword: ', timeout=2)
         DisplayText(SS.before, SS.after)
@@ -220,7 +216,7 @@ def Query_Circuit_Info_EOS(Host):
     SS.sendline(KSSJPOTP)
     SS.expect('\$ ')
     DisplayText(SS.before, SS.after)
-    SS.sendline('kss 121.78.64.102')
+    SS.sendline('ssh XXXX')                                         # ssh 'Jumpe server IP'
     try:
         SS.expect('Password: ', timeout=2)
         DisplayText(SS.before, SS.after)
@@ -294,7 +290,7 @@ def Query_Circuit_Info_CER(Host):
     SS.sendline(KSSJPOTP)
     SS.expect('\$ ')
     DisplayText(SS.before, SS.after)
-    SS.sendline('kss '+Host+'.net.cdngp.net '+ID)
+    SS.sendline('ssh XXXX')                                         # ssh 'Jumpe server IP'
     try:
         SS.expect('Password:', timeout=2)
         DisplayText(SS.before, SS.after)
@@ -831,9 +827,9 @@ class WEB_Control:
         self.PMTitle = PMTitle
         self.PMContents = PMContents
         self.WMContents = WMContents
-        self.IM = 'https://im.cdnetworks.com'
-        self.Schedule = '/network/pm_schedule.jsp?sd=2018-10-25&pidx=0'
-        self.IMCalander = 'https://im.cdnetworks.com/network/pm_cal.jsp'
+        self.IM = 'XXXXXXX.com'                                 # Scheduler portal site address
+        self.Schedule = 'XXXXXXX.jsp?sd=2018-10-25&pidx=0'      # Scheduler detail URL
+        self.IMCalander = 'XXXXXX.com/XXXXXX.jsp'               # Calander on Scheduler system
         self.STTDate = StartTime.split(' ')[0]
         self.STTHour = StartTime.split(' ')[1].split(':')[0]
         self.STTMin = StartTime.split(' ')[1].split(':')[1]
@@ -1022,16 +1018,16 @@ class WEB_Control:
         WMTicketSubmit.click()
         time.sleep(2)
 
-        browser.get('https://issues.cdnetworks.com/secure/QuickSearch.jspa?searchString=NETWM%20'+refNum)
+        browser.get('XXXX.com/'+refNum)                 # internal ticketing system URL
         time.sleep(2)
-        browser.get('https://issues.cdnetworks.com/secure/QuickSearch.jspa?searchString=NETWM%20'+refNum)
+        browser.get('XXXX.com/'+refNum)                 # internal ticketing system URL
         time.sleep(10)
 
         Attr = browser.find_element_by_xpath('//*[@data-issue-table-model-state]')
         Info = str(Attr.get_attribute('data-issue-table-model-state'))
         TicketNumber = NETWMRe.findall(Info)[0]
 
-        browser.get('https://issues.cdnetworks.com/browse/'+TicketNumber)
+        browser.get('XXXX.com/'+TicketNumber)           # internal ticketing system URL
         time.sleep(2)
 
         More = browser.find_element_by_id('opsbar-operations_more')
@@ -1052,17 +1048,16 @@ class WEB_Control:
 
 ################# main #######################################################################
 
-POP = 'P37-ICN'
-StartTime = '2019-09-02 17:00'
-EndTime = '2019-09-02 21:00'
-ISP = 'SJT'
-RefNum = '3394879'
-PMTarget = '2017001143'
-PMType = 'Emergency'
-PMReason = 'Maintenance Optical Fiber'
-
-Reporter = 'jaekyeong.yun'
-Reporter_Team = 'KR Network Team'
+POP = input('Enter POP Code')
+StartTime = input('Enter PM Start time - GMT timezone(ex: 2019-09-02 17:00): ')
+EndTime = input('Enter PM End time - GMT timezone(ex: 2019-09-02 21:00): ')
+ISP = input('Enter ISP name: ')
+RefNum = input('Enter ISP ticket number for maintenance: ')
+PMTarget = input('Enter target circuit ID(ex: A0001, A0002): ')
+PMType = input('Enter maintenance type(Planned / Urgent): ')
+PMReason = input('Enter maintenance reason: ')
+Reporter = input('Enter engineer name: ')
+Reporter_Team = input('Enter engineer\'s own team: ')
 
 PMTarget = PMTarget.split(',')
 
